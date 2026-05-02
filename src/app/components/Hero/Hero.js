@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import styles from './Hero.module.scss';
 
-const API = 'http://localhost:8502';
+const API = 'https://khushsharma262-portfolio-rag.hf.space';
 
 function TypingIndicator() {
   return (
@@ -157,3 +157,4 @@ export default function Hero() {
     </section>
   );
 }
+
