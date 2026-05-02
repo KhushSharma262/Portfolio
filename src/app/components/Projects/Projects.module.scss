@@ -1,0 +1,372 @@
+﻿@import '../../styles/mixins';
+
+.projects {
+  @include section-padding;
+  background: linear-gradient(180deg, #060d1f 0%, #020617 100%);
+}
+
+.inner { max-width: 1200px; margin: 0 auto; }
+
+.label { @include mono-tag; display: block; margin-bottom: 1rem; }
+
+.h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 3.5rem;
+  color: var(--text);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+
+  @media (max-width: 768px) { grid-template-columns: 1fr; }
+}
+
+.card {
+  position: relative;
+  padding: 2rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.02);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+  user-select: none;
+
+  &:hover {
+    border-color: rgba(255,255,255,0.1);
+    transform: translateY(-4px);
+  }
+}
+
+.topGlow {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--c);
+  opacity: 0;
+  transition: opacity 0.3s;
+
+  .card:hover & { opacity: 1; }
+}
+
+.progressBar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.06);
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 0 2px 2px 0;
+  transition: width 0.03s linear;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.2rem;
+}
+
+.num {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--accent);
+  opacity: 0.6;
+}
+
+.category {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.8rem;
+}
+
+.p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.65;
+  margin-bottom: 1.4rem;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 50px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: #e2e8f0;
+}
+
+.hoverHint {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  color: var(--text-muted);
+  opacity: 0.4;
+  margin-top: 0.5rem;
+  transition: opacity 0.3s;
+
+  .card:hover & { opacity: 0.8; }
+}
+
+.arrow { font-size: 1rem; color: var(--text-muted); }
+
+/* ── Popup ─────────────────────────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(2,6,23,0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.popup {
+  background: #0d1b35;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 780px;
+  max-height: 90vh;
+  overflow-y: auto;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
+}
+
+.popupHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 2rem 2rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--c);
+    border-radius: 24px 24px 0 0;
+  }
+
+  @media (max-width: 480px) { padding: 1.5rem 1.2rem 1rem; }
+}
+
+.popupId {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.popupTitle {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 0.3rem;
+
+  @media (max-width: 480px) { font-size: 1.3rem; }
+}
+
+.popupCat {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.closeBtn {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.2s, color 0.2s;
+
+  &:hover { background: rgba(255,255,255,0.12); color: var(--text); }
+}
+
+.ndaBanner {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin: 1.5rem 2rem;
+  padding: 1rem 1.2rem;
+  background: rgba(251,113,133,0.08);
+  border: 1px solid rgba(251,113,133,0.2);
+  border-radius: 12px;
+
+  @media (max-width: 480px) { margin: 1rem 1.2rem; }
+}
+
+.ndaIcon { font-size: 1.2rem; flex-shrink: 0; margin-top: 0.1rem; }
+
+.ndaTitle {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fb7185;
+  display: block;
+  margin-bottom: 0.3rem;
+}
+
+.ndaDesc {
+  font-size: 0.83rem;
+  color: var(--text-muted);
+  line-height: 1.55;
+
+  strong { color: var(--text); }
+}
+
+.popupBody {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  padding: 1.5rem 2rem 2rem;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    padding: 1.2rem;
+    gap: 1.5rem;
+  }
+}
+
+.sectionTitle {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: block;
+  margin-bottom: 1rem;
+}
+
+/* ── Flowchart ─────────────────────────────────────── */
+
+.flowChart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.flowRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.flowNode {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  border-left: 3px solid var(--fc);
+  text-align: left;
+}
+
+.flowLabel {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.flowSub {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  display: block;
+}
+
+.flowArrow {
+  font-size: 1rem;
+  color: var(--text-muted);
+  opacity: 0.4;
+  padding: 0.2rem 0;
+}
+
+/* ── Right panel ───────────────────────────────────── */
+
+.popupTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.popupTag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 50px;
+  border: 1px solid var(--c);
+  color: var(--c);
+  background: rgba(255,255,255,0.03);
+}
+
+.resultBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+
+.resultItem {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.82rem;
+  color: #e2e8f0;
+  line-height: 1.4;
+}
+
+.resultDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}

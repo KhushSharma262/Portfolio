@@ -1,0 +1,139 @@
+﻿@import '../../styles/mixins';
+
+.skills {
+  @include section-padding;
+  background: #020617;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(56,189,248,0.2), transparent);
+  }
+}
+
+.inner { max-width: 1200px; margin: 0 auto; }
+
+.label { @include mono-tag; display: block; margin-bottom: 1rem; }
+
+.h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 3.5rem;
+  color: var(--text);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.4rem;
+
+  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 580px)  { grid-template-columns: 1fr; }
+}
+
+.card {
+  @include glass;
+  border-radius: 20px;
+  padding: 1.8rem;
+  transition: border-color 0.3s;
+  position: relative;
+  overflow: hidden;
+  cursor: default;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent-color);
+    opacity: 0;
+    transition: opacity 0.3s;
+    border-radius: 20px 20px 0 0;
+  }
+
+  &:hover {
+    border-color: rgba(255,255,255,0.12);
+    &::before { opacity: 1; }
+  }
+
+  @media (max-width: 580px) {
+    padding: 1.4rem;
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.icon {
+  font-size: 1.1rem;
+  font-weight: 700;
+  width: 22px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.category {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #e2e8f0;
+  font-weight: 600;
+  flex: 1;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--accent-color);
+  background: rgba(255,255,255,0.06);
+  padding: 0.18rem 0.55rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.divider {
+  height: 1px;
+  opacity: 0.2;
+  border-radius: 1px;
+  margin-bottom: 1.2rem;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.pill {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 0.4rem 0.9rem;
+  border-radius: 50px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: #ffffff;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+  cursor: default;
+
+  &:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: var(--c);
+    color: var(--c);
+  }
+
+  @media (max-width: 580px) {
+    font-size: 0.72rem;
+    padding: 0.35rem 0.75rem;
+  }
+}
