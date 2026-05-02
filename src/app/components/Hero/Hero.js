@@ -92,10 +92,10 @@ export default function Hero() {
       const res = await fetch(`${API}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: isInit ? 'hi' : trimmed, session_state: isInit ? {} : sessionState }),
+        body: JSON.stringify({ message: isInit ? "hi" : trimmed, greeted: sessionState.greeted || false, awaiting_name: sessionState.awaiting_name || false, user_name: sessionState.user_name || null }),
       });
       const data = await res.json();
-      setSessionState(data.session_state || {});
+      setSessionState({ greeted: data.greeted, awaiting_name: data.awaiting_name, user_name: data.user_name });
       setMessages(prev => [...prev, { role: 'bot', content: data.answer }]);
     } catch (err) {
       console.error('API error:', err);
@@ -157,4 +157,6 @@ export default function Hero() {
     </section>
   );
 }
+
+
 
