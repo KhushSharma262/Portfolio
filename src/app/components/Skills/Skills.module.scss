@@ -2,138 +2,307 @@
 
 .skills {
   @include section-padding;
-  background: #020617;
   position: relative;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(56,189,248,0.2), transparent);
-  }
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
 }
 
-.inner { max-width: 1200px; margin: 0 auto; }
+.inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 2; }
 
-.label { @include mono-tag; display: block; margin-bottom: 1rem; }
+.label { @include mono-tag; display: block; margin-bottom: 1.5rem; }
 
-.h2 {
+.inner h2 {
   font-family: var(--font-display);
-  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-size: clamp(2.4rem, 3.5vw, 3.2rem);
   font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 2.5rem;
   letter-spacing: -0.02em;
-  margin-bottom: 3.5rem;
   color: var(--text);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.4rem;
+.accent { @include gradient-text; }
 
-  @media (max-width: 1024px) { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 580px)  { grid-template-columns: 1fr; }
-}
-
-.card {
-  @include glass;
-  border-radius: 20px;
-  padding: 1.8rem;
-  transition: border-color 0.3s;
-  position: relative;
-  overflow: hidden;
-  cursor: default;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 3px;
-    background: var(--accent-color);
-    opacity: 0;
-    transition: opacity 0.3s;
-    border-radius: 20px 20px 0 0;
-  }
-
-  &:hover {
-    border-color: rgba(255,255,255,0.12);
-    &::before { opacity: 1; }
-  }
-
-  @media (max-width: 580px) {
-    padding: 1.4rem;
-  }
-}
-
-.cardHeader {
+/* ---------- Tree ---------- */
+.tree {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
-  margin-bottom: 1rem;
+  gap: 0;
+
+  @media (max-width: 860px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2rem;
+  }
 }
 
-.icon {
-  font-size: 1.1rem;
-  font-weight: 700;
-  width: 22px;
-  text-align: center;
+/* root */
+.root {
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding-right: 0.5rem;
+
+  @media (max-width: 860px) { flex-direction: row; gap: 0.8rem; }
 }
 
-.category {
+.rootDot {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--text);
+  box-shadow: 0 0 0 5px rgba(255,255,255,0.08), 0 0 22px rgba(255,255,255,0.4);
+}
+
+.rootLabel {
   font-family: var(--font-mono);
-  font-size: 0.78rem;
-  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #e2e8f0;
-  font-weight: 600;
+  color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
+/* horizontal stub from root to trunk */
+.trunk {
+  flex-shrink: 0;
+  width: 46px;
+  height: 2px;
+  background: rgba(255,255,255,0.18);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s ease 0.1s;
+
+  @media (max-width: 860px) { display: none; }
+}
+
+.tree.drawn .trunk { transform: scaleX(1); }
+
+/* branches column */
+.branches {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
   flex: 1;
+  min-width: 0;
 }
 
-.count {
-  font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: var(--accent-color);
-  background: rgba(255,255,255,0.06);
-  padding: 0.18rem 0.55rem;
-  border-radius: 20px;
-  border: 1px solid rgba(255,255,255,0.08);
+/* vertical spine linking category rows */
+.branches::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 22px;
+  bottom: 22px;
+  width: 2px;
+  background: rgba(255,255,255,0.14);
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.6s ease 0.25s;
 }
 
-.divider {
-  height: 1px;
-  opacity: 0.2;
-  border-radius: 1px;
-  margin-bottom: 1.2rem;
+.tree.drawn .branches::before { transform: scaleY(1); }
+
+/* ---------- Row (category + its leaves) ---------- */
+.row {
+  --accent: #4f8ef7;
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  padding-left: 0;
+  transition: opacity 0.35s ease, filter 0.35s ease;
 }
 
-.pills {
+.row.dim { opacity: 0.32; filter: saturate(0.6); }
+
+.catNode {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  margin-top: 4px;
+  gap: 0.6rem;
+  padding: 0.7rem 1.1rem 0.7rem 1.2rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(16, 20, 38, 0.5);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  position: relative;
+  margin-left: 22px;
+  transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+}
+
+/* little connector from spine to category node */
+.catNode::before {
+  content: '';
+  position: absolute;
+  left: -22px;
+  top: 50%;
+  width: 22px;
+  height: 2px;
+  background: rgba(255,255,255,0.14);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+}
+
+.tree.drawn .row:nth-child(1) .catNode::before { transition-delay: 0.4s; transform: scaleX(1); }
+.tree.drawn .row:nth-child(2) .catNode::before { transition-delay: 0.5s; transform: scaleX(1); }
+.tree.drawn .row:nth-child(3) .catNode::before { transition-delay: 0.6s; transform: scaleX(1); }
+.tree.drawn .row:nth-child(4) .catNode::before { transition-delay: 0.7s; transform: scaleX(1); }
+
+.row.activeRow .catNode {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent) inset, 0 0 28px color-mix(in srgb, var(--accent) 35%, transparent);
+  transform: translateX(2px);
+}
+
+.catDot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 12px var(--accent);
+}
+
+.catLabel {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+/* branch line from category to leaves */
+.branch {
+  flex-shrink: 0;
+  width: 34px;
+  height: 2px;
+  margin-top: 22px;
+  background: color-mix(in srgb, var(--accent) 50%, rgba(255,255,255,0.12));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.4s ease;
+
+  @media (max-width: 860px) { display: none; }
+}
+
+.tree.drawn .row:nth-child(1) .branch { transition-delay: 0.55s; transform: scaleX(1); }
+.tree.drawn .row:nth-child(2) .branch { transition-delay: 0.65s; transform: scaleX(1); }
+.tree.drawn .row:nth-child(3) .branch { transition-delay: 0.75s; transform: scaleX(1); }
+.tree.drawn .row:nth-child(4) .branch { transition-delay: 0.85s; transform: scaleX(1); }
+
+/* during breathe: dim structure, spotlight root + leaves */
+.tree.breathing .catNode,
+.tree.breathing .branch,
+.tree.breathing .trunk { opacity: 0.3; transition: opacity 0.4s ease; }
+
+.tree.breathing .branches::before { opacity: 0.3; }
+
+.tree.breathing .leaf {
+  border-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+/* ---------- Breathe on root hover ---------- */
+@keyframes leafBreathe {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); box-shadow: 0 10px 22px color-mix(in srgb, var(--accent) 25%, transparent); }
+}
+
+.tree.breathing .leaf {
+  animation: leafBreathe 1.6s ease-in-out infinite;
+}
+
+
+
+
+
+@media (prefers-reduced-motion: reduce) {
+  .tree.breathing .leaf { animation: none; }
+}
+/* ---------- Leaves ---------- */
+.leaves {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.55rem;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 0;
 }
 
-.pill {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 500;
-  padding: 0.4rem 0.9rem;
-  border-radius: 50px;
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: #ffffff;
-  transition: background 0.2s, border-color 0.2s, color 0.2s;
-  cursor: default;
-
-  &:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: var(--c);
-    color: var(--c);
-  }
-
-  @media (max-width: 580px) {
-    font-size: 0.72rem;
-    padding: 0.35rem 0.75rem;
-  }
+.leaf {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  transition: border-color 0.3s, background 0.3s, transform 0.3s;
 }
+
+.row.activeRow .leaf {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  background: color-mix(in srgb, var(--accent) 8%, rgba(255,255,255,0.03));
+}
+
+.row.activeRow .leaf:hover {
+  transform: translateY(-3px);
+  border-color: var(--accent);
+  box-shadow: 0 6px 20px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+
+.leafIcons { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
+
+.iconSlot { position: relative; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; }
+
+.leafIcon { width: 20px; height: 20px; filter: brightness(0) invert(1); opacity: 0.85; }
+
+.fallback {
+  display: none;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+.iconSlot.broken .leafIcon { display: none; }
+.iconSlot.broken .fallback { display: flex; }
+
+.leafText { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+
+.leafName {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.levelBar {
+  width: 100%;
+  min-width: 54px;
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.1);
+  overflow: hidden;
+}
+
+.levelFill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+
+
+
+
+
+
+
+
+

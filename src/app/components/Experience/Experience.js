@@ -1,214 +1,155 @@
 ﻿'use client'
-import { useRef, useState, useEffect, useCallback } from 'react'
-import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { useRef, useState } from 'react'
+import { motion, AnimatePresence, useInView } from 'framer-motion'
 import styles from './Experience.module.scss'
 
+// type: 'role' (blue) | 'education' (violet)
 const TIMELINE = [
   {
-    year: '2025 - 2026',
-    role: 'Technical Intern',
-    company: 'LatentHQ (AlphaOBS)',
-    desc: 'Building RAG systems, LLM pipelines, and AI-powered products for clients. Focus on production-grade architecture and intelligent web systems.',
-    color: '#38bdf8',
-    projects: [
-      { name: 'Offer Letter Automation', time: 'Oct 2024', desc: 'Auto-generates offer letters from form submissions using Zapier + Google APIs.' },
-      { name: 'Project Dashboard', time: 'Dec 2024', desc: 'Streamlit KPI dashboard integrating Jira API for live project tracking.' },
-      { name: 'Document Chatbot', time: 'Feb 2025', desc: 'RAG-based chatbot answering queries from 100+ page internal documents.' },
+    id: 'btech',
+    type: 'education',
+    period: '2023',
+    title: '1st Year of BTech',
+    org: 'MIT ADT University',
+    summary:
+      'Explored domains of engineering — confused and lost at first, but stuck to one topic and decided to go deep.',
+    milestones: [
+      { date: 'Aug 2023', label: 'Python Fundamentals', text: 'Built strong foundations in Python, DSA, and object-oriented programming.' },
+      { date: 'Oct 2023', label: 'Web Basics', text: 'Learned HTML, CSS, JavaScript — built first personal webpage.' },
+      { date: 'Dec 2023', label: 'ML Exploration', text: 'First steps into ML using Scikit-learn, Pandas, and NumPy.' },
     ],
   },
   {
-    year: '2024 - 2025',
-    role: 'Research Trainee',
-    company: 'DRDO',
-    desc: 'Real-world problem solving at defence research level. Built C# flight simulation models and NLP pipelines using TensorFlow and BERT.',
-    color: '#c084fc',
-    projects: [
-      { name: 'Flight Simulation Model', time: 'Dec 2024', desc: 'C# real-time aircraft simulation for research and testing purposes.' },
-      { name: 'NLP Document Pipeline', time: 'Jan 2025', desc: 'Structured NLP pipeline using TensorFlow and BERT for defence documents.' },
-      { name: 'Research Documentation', time: 'Jul 2025', desc: 'Authored technical docs and collaborated with research scientists.' },
+    id: 'ml-project',
+    type: 'role',
+    period: '2024',
+    title: '1st ML Project',
+    org: 'Self Interest',
+    summary:
+      'CNN real-time emotion detection system. Optimised the inference pipeline for edge deployment at 20fps on hardware.',
+    milestones: [
+      { date: 'Mar 2024', label: 'Emotion Detection CNN', text: 'Real-time facial emotion recognition using CNN and OpenCV at 20fps.' },
+      { date: 'Apr 2024', label: 'Edge Optimisation', text: 'Pruned and optimised the model for low-latency edge hardware deployment.' },
     ],
   },
   {
-    year: '2024',
-    role: '1st ML Project',
-    company: 'Self Interest',
-    desc: 'CNN real-time emotion detection system. Optimised inference pipeline for edge deployment with 20fps on hardware.',
-    color: '#4ade80',
-    projects: [
-      { name: 'Emotion Detection CNN', time: 'Mar 2024', desc: 'Real-time facial emotion recognition using CNN and OpenCV at 20fps.' },
-      { name: 'Edge Optimisation', time: 'Apr 2024', desc: 'Pruned and optimised model for low-latency edge hardware deployment.' },
-      { name: 'Badminton Analytics', time: 'Aug 2024', desc: 'Computer vision system for tracking gameplay and extracting metrics.' },
+    id: 'drdo',
+    type: 'role',
+    period: '2024 – 2025',
+    title: 'Research Trainee',
+    org: 'DRDO',
+    summary:
+      'Real-world problem solving at defence-research level. Built C# flight-simulation models and NLP pipelines with TensorFlow and BERT.',
+    milestones: [
+      { date: 'Dec 2024', label: 'Flight Simulation Model', text: 'C# real-time aircraft simulation for research and testing purposes.' },
+      { date: 'Jan 2025', label: 'NLP Document Pipeline', text: 'Structured NLP pipeline using TensorFlow and BERT for defence documents.' },
+      { date: 'Jul 2025', label: 'Research Documentation', text: 'Authored technical docs and collaborated with research scientists.' },
     ],
   },
   {
-    year: '2023',
-    role: '1st Year of BTech',
-    company: 'MIT ADT University',
-    desc: 'Explored domains of engineering, was confused, lost, but stuck to one topic and decided to explore it deeply.',
-    color: '#f59e0b',
-    projects: [
-      { name: 'Python Fundamentals', time: 'Aug 2023', desc: 'Built strong foundations in Python, DSA, and object-oriented programming.' },
-      { name: 'Web Basics', time: 'Oct 2023', desc: 'Learned HTML, CSS, JavaScript — built first personal webpage.' },
-      { name: 'ML Exploration', time: 'Dec 2023', desc: 'First steps into ML using Scikit-learn, Pandas, and NumPy.' },
+    id: 'latenthq',
+    type: 'role',
+    period: '2025 – 2026',
+    title: 'Technical Intern',
+    org: 'LatentHQ (AlphaOBS)',
+    summary:
+      'Building RAG systems, LLM pipelines, and AI-powered products for clients. Focus on production-grade architecture and intelligent web systems.',
+    milestones: [
+      { date: 'Oct 2025', label: 'Offer Letter Automation', text: 'Auto-generates offer letters from form submissions using Zapier + Google APIs.' },
+      { date: 'Dec 2025', label: 'Project Dashboard', text: 'Streamlit KPI dashboard integrating Jira API for live project tracking.' },
+      { date: 'Feb 2026', label: 'Document Chatbot', text: 'RAG-based chatbot answering queries from 100+ page internal documents.' },
     ],
   },
 ]
 
-const PROJ_CARD_HEIGHT = 72 // approx height of each project card in px
-const PROJ_GAP = 8          // gap between cards in px
-
-function TimelineItem({ item, i, inView, isActive, isPushedDown, isPushedUp, onActivate, onDeactivate }) {
-  const timerRef = useRef(null)
-
-  const handleEnter = useCallback(() => {
-    timerRef.current = setTimeout(() => onActivate(i), 500)
-  }, [i, onActivate])
-
-  const handleLeave = useCallback(() => {
-    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null }
-    onDeactivate()
-  }, [onDeactivate])
-
-  useEffect(() => () => { if (timerRef.current) clearTimeout(timerRef.current) }, [])
-
-  // Calculate exact top position for each sub-dot
-  // They need to align with the center of each project card
-  // Cards start after: h3 (~28px) + company (~20px) + p (~60px) + projects margin (16px)
-  const CARDS_OFFSET = 130 // px from top of .right to first project card center
-  const dotPositions = item.projects.map((_, pi) =>
-    CARDS_OFFSET + pi * (PROJ_CARD_HEIGHT + PROJ_GAP) + PROJ_CARD_HEIGHT / 2
-  )
-
+function Step({ item, active, onActivate }) {
+  const isOpen = active === item.id
   return (
-    <motion.div
-      className={styles.item}
-      initial={{ opacity:0, x:-30 }}
-      animate={inView ? {
-        opacity: 1,
-        x: 0,
-        y: isPushedDown ? 48 : isPushedUp ? -48 : 0,
-      } : {}}
-      transition={{ duration:0.45, delay: 0.2 + i * 0.12, ease:[0.16,1,0.3,1] }}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}>
-
-      {/* Year */}
-      <div className={styles.left}>
-        <span className={styles.year} style={{ color: isActive ? item.color : undefined }}>
-          {item.year}
-        </span>
+    <div
+      className={`${styles.step} ${isOpen ? styles.open : ''} ${styles[item.type]}`}
+      onMouseEnter={() => onActivate(item.id)}
+      onClick={() => onActivate(isOpen ? null : item.id)}
+    >
+      <div className={styles.node}>
+        <span className={styles.nodeDot} />
       </div>
 
-      {/* Spine */}
-      <div className={styles.center}>
-        <motion.div className={styles.dot}
-          animate={{
-            scale: isActive ? 1.7 : 1,
-            backgroundColor: isActive ? item.color : '#334155',
-            boxShadow: isActive ? `0 0 16px ${item.color}88` : 'none',
-          }}
-          transition={{ duration:0.25 }}
-        />
-
-        <div className={styles.lineWrap}>
-          <div className={styles.line}
-            style={{
-              background: isActive ? item.color : 'rgba(255,255,255,0.1)',
-              opacity: isActive ? 0.25 : 1,
-            }} />
-
-          <AnimatePresence>
-            {isActive && dotPositions.map((topPx, pi) => (
-              <motion.div key={pi}
-                className={styles.subDot}
-                style={{ background: item.color, top: `${topPx}px` }}
-                initial={{ opacity:0, scale:0 }}
-                animate={{ opacity:1, scale:1 }}
-                exit={{ opacity:0, scale:0 }}
-                transition={{ delay: pi * 0.09, duration:0.2 }}
-              />
-            ))}
-          </AnimatePresence>
-        </div>
+      <div className={styles.head}>
+        <span className={styles.period}>{item.period}</span>
+        <h3 className={styles.title}>{item.title}</h3>
+        <span className={styles.org}>{item.org}</span>
       </div>
 
-      {/* Right content */}
-      <motion.div className={styles.right}
-        animate={{ x: isActive ? 20 : 0 }}
-        transition={{ duration:0.3 }}>
-
-        <h3 className={styles.h3} style={{ color: isActive ? item.color : undefined }}>
-          {item.role}
-        </h3>
-        <span className={styles.company}>{item.company}</span>
-        <p className={styles.p}>{item.desc}</p>
-
-        <AnimatePresence>
-          {isActive && (
-            <motion.div className={styles.projects}
-              initial={{ opacity:0, height:0 }}
-              animate={{ opacity:1, height:'auto' }}
-              exit={{ opacity:0, height:0 }}
-              transition={{ duration:0.35, ease:[0.16,1,0.3,1] }}>
-              {item.projects.map((proj, pi) => (
-                <motion.div key={pi} className={styles.projItem}
-                  style={{ '--c': item.color }}
-                  initial={{ opacity:0, x:-12 }}
-                  animate={{ opacity:1, x:0 }}
-                  exit={{ opacity:0, x:-12 }}
-                  transition={{ delay: pi * 0.09 }}>
-                  <div className={styles.projTop}>
-                    <span className={styles.projName}>{proj.name}</span>
-                    <span className={styles.projTime}>{proj.time}</span>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            className={styles.details}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <p className={styles.summary}>{item.summary}</p>
+            <ul className={styles.milestones}>
+              {item.milestones.map((m, i) => (
+                <motion.li
+                  key={m.label}
+                  className={styles.milestone}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.1 + i * 0.08, duration: 0.3 }}
+                >
+                  <span className={styles.mDot} />
+                  <div className={styles.mText}>
+                    <span className={styles.mLabel}>{m.label}</span>
+                    <span className={styles.mDate}>{m.date}</span>
+                    <span className={styles.mDesc}>{m.text}</span>
                   </div>
-                  <span className={styles.projDesc}>{proj.desc}</span>
-                </motion.div>
+                </motion.li>
               ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.div>
-    </motion.div>
+            </ul>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   )
 }
 
 export default function Experience() {
   const ref = useRef()
-  const inView = useInView(ref, { once: true, margin: '-80px' })
-  const [activeIdx, setActiveIdx] = useState(null)
-
-  const onActivate   = useCallback((i) => setActiveIdx(i), [])
-  const onDeactivate = useCallback(() => setActiveIdx(null), [])
+  const inView = useInView(ref, { once: true, margin: '-100px' })
+  const [active, setActive] = useState('latenthq')
 
   return (
-    <section id='experience' className={styles.exp} ref={ref}>
+    <section id="experience" className={styles.experience} ref={ref}>
       <div className={styles.inner}>
-        <motion.span className={styles.label}
-          initial={{ opacity:0 }} animate={inView ? { opacity:1 } : {}} transition={{ duration:0.6 }}>
-          Academic Experience
+        <motion.span
+          className={styles.label}
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.6 }}
+        >
+          Experience
         </motion.span>
 
-        <motion.h2 className={styles.h2}
-          initial={{ opacity:0, y:24 }}
-          animate={inView ? { opacity:1, y:0 } : {}}
-          transition={{ duration:0.8, delay:0.1, ease:[0.16,1,0.3,1] }}>
-          The path so far.
+        <motion.h2
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        >
+          The path<br />
+          <span className={styles.accent}>so far.</span>
         </motion.h2>
 
-        <div className={styles.timeline}>
-          {TIMELINE.map((item, i) => (
-            <TimelineItem
-              key={i} item={item} i={i} inView={inView}
-              isActive={activeIdx === i}
-              isPushedDown={activeIdx !== null && i > activeIdx}
-              isPushedUp={activeIdx !== null && i < activeIdx}
-              onActivate={onActivate}
-              onDeactivate={onDeactivate}
-            />
-          ))}
+        <div className={styles.track} onMouseLeave={() => setActive('latenthq')}>
+          <div className={styles.line} />
+          <div className={styles.steps}>
+            {TIMELINE.map((item) => (
+              <Step key={item.id} item={item} active={active} onActivate={setActive} />
+            ))}
+          </div>
         </div>
       </div>
     </section>
   )
 }
-

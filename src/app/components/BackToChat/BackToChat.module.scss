@@ -1,33 +1,77 @@
 ﻿.btn {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  z-index: 999;
-  display: flex;
+  bottom: 1.75rem;
+  right: 1.75rem;
+  z-index: 120;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1.2rem;
-  border-radius: 50px;
-  background: linear-gradient(135deg, #38bdf8, #818cf8);
-  color: #020617;
-  font-family: var(--font-display);
-  font-size: 0.85rem;
-  font-weight: 700;
+  justify-content: center;
+  padding: 0;
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 24px rgba(56,189,248,0.35);
-  transition: box-shadow 0.3s;
-
-  &:hover { box-shadow: 0 6px 32px rgba(56,189,248,0.55); }
-
-  @media (max-width: 600px) {
-    bottom: 1.2rem;
-    right: 1.2rem;
-    padding: 0.65rem 1rem;
-    font-size: 0.78rem;
-  }
+  border-radius: 999px;
+  background: transparent;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.label {
-  @media (max-width: 380px) { display: none; }
+/* the visible pill — blended, glassy blue (not neon) */
+.content {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.8rem 1.35rem;
+  border-radius: 999px;
+  color: #eaf2ff;
+  font-family: var(--font-display, sans-serif);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.01em;
+  background:
+    linear-gradient(135deg,
+      rgba(79, 142, 247, 0.85) 0%,
+      rgba(60, 110, 210, 0.82) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(12px) saturate(150%);
+  -webkit-backdrop-filter: blur(12px) saturate(150%);
+  box-shadow:
+    0 6px 22px rgba(20, 40, 90, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  transition: box-shadow 0.4s ease;
+}
+
+.content svg { width: 18px; height: 18px; opacity: 0.95; }
+
+.btn:hover .content {
+  box-shadow:
+    0 8px 28px rgba(79, 142, 247, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* soft breathing halo — gentle, blends into the dark bg */
+.glow {
+  position: absolute;
+  inset: -6px;
+  z-index: 1;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(79, 142, 247, 0.45), transparent 70%);
+  filter: blur(10px);
+  opacity: 0.6;
+  animation: breathe 3.4s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.35; transform: scale(0.96); }
+  50%      { opacity: 0.7;  transform: scale(1.06); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glow { animation: none; }
+}
+
+@media (max-width: 600px) {
+  .btn { bottom: 1.1rem; right: 1.1rem; }
+  .label { display: none; }
+  .content { padding: 0.8rem; }
 }

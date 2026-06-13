@@ -2,29 +2,28 @@
   position: fixed;
   top: 0; left: 0;
   width: 32px; height: 32px;
-  border: 1.5px solid rgba(56,189,248,0.6);
   border-radius: 50%;
+  border: 1.5px solid rgba(79, 142, 247, 0.6);
   pointer-events: none;
   z-index: 9999;
-  transition: width 0.3s, height 0.3s, border-color 0.3s;
-  will-change: transform;
+  transition: width 0.2s, height 0.2s, border-color 0.2s, background 0.2s;
+  mix-blend-mode: normal;
+}
+
+.ring.grow {
+  width: 52px;
+  height: 52px;
+  border-color: rgba(79, 142, 247, 0.9);
+  background: rgba(79, 142, 247, 0.06);
 }
 
 .dot {
   position: fixed;
   top: 0; left: 0;
-  width: 8px; height: 8px;
-  background: #38bdf8;
+  width: 5px; height: 5px;
   border-radius: 50%;
+  background: #4f8ef7;
   pointer-events: none;
   z-index: 9999;
-  will-change: transform;
+  box-shadow: 0 0 8px rgba(79, 142, 247, 0.8);
 }
-
-.grow {
-  width: 56px;
-  height: 56px;
-  border-color: rgba(56,189,248,0.9);
-  background: rgba(56,189,248,0.05);
-}
-

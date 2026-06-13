@@ -9,6 +9,7 @@ export default function Navbar() {
   const [scrolled,   setScrolled]   = useState(false)
   const [open,       setOpen]       = useState(false)
   const [activeLink, setActiveLink] = useState('')
+  const [hovered,    setHovered]    = useState(null)
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 60)
@@ -18,7 +19,6 @@ export default function Navbar() {
 
   useEffect(() => {
     const sections = LINKS.map(l => document.getElementById(l.toLowerCase())).filter(Boolean)
-
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach(entry => {
@@ -27,12 +27,8 @@ export default function Navbar() {
           }
         })
       },
-      {
-        rootMargin: '-40% 0px -55% 0px',
-        threshold: 0,
-      }
+      { rootMargin: '-40% 0px -55% 0px', threshold: 0 }
     )
-
     sections.forEach(s => observer.observe(s))
     return () => sections.forEach(s => observer.unobserve(s))
   }, [])
@@ -44,51 +40,68 @@ export default function Navbar() {
 
   return (
     <motion.nav
-      className={[styles.nav, scrolled ? styles.scrolled : ''].join(' ')}
+      className={styles.navWrapper}
       initial={{ y: -80, opacity: 0 }}
       animate={{ y: 0,   opacity: 1 }}
       transition={{ duration: 0.8, delay: 0.5, ease: [0.16,1,0.3,1] }}
     >
-      <button className={styles.logo} onClick={() => window.scrollTo({ top:0, behavior:'smooth' })}>
-        KS<span className={styles.dot}>.</span>
-      </button>
+      <motion.div
+        className={[styles.island, scrolled ? styles.scrolled : ''].join(' ')}
+        layout
+        transition={{ type: 'spring', stiffness: 400, damping: 40 }}
+      >
+        <button className={styles.logo} onClick={() => window.scrollTo({ top:0, behavior:'smooth' })}>
+          KS<span className={styles.dot}>.</span>
+        </button>
 
-      <ul className={styles.links}>
-        {LINKS.map((l, i) => (
-          <motion.li key={l}
-            initial={{ opacity:0, y:-10 }}
-            animate={{ opacity:1, y:0 }}
-            transition={{ delay: 0.7 + i * 0.08 }}
-          >
-            <button
-              onClick={() => scrollTo(l)}
-              className={activeLink === l ? styles.active : ''}>
-              {l}
-              {activeLink === l && (
-                <motion.span
-                  className={styles.activeDot}
-                  layoutId='activeDot'
-                  transition={{ type:'spring', stiffness:380, damping:30 }}
-                />
-              )}
-            </button>
-          </motion.li>
-        ))}
-      </ul>
+        <div className={styles.divider} />
 
-      <button className={styles.burger} onClick={() => setOpen(!open)}>
-        <span className={open ? styles.open : ''} />
-        <span className={open ? styles.open : ''} />
-        <span className={open ? styles.open : ''} />
-      </button>
+        <ul className={styles.links} onMouseLeave={() => setHovered(null)}>
+          {LINKS.map((l, i) => (
+            <motion.li key={l}
+              initial={{ opacity:0, y:-8 }}
+              animate={{ opacity:1, y:0 }}
+              transition={{ delay: 0.7 + i * 0.07 }}
+            >
+              <button
+                className={[styles.linkBtn, activeLink === l ? styles.active : ''].join(' ')}
+                onClick={() => scrollTo(l)}
+                onMouseEnter={() => setHovered(l)}
+              >
+                {hovered === l && (
+                  <motion.span
+                    className={styles.hoverBg}
+                    layoutId="hoverBg"
+                    transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                  />
+                )}
+                <span className={styles.linkText}>{l}</span>
+                {activeLink === l && (
+                  <motion.span
+                    className={styles.activeDot}
+                    layoutId="activeDot"
+                    transition={{ type:'spring', stiffness:380, damping:30 }}
+                  />
+                )}
+              </button>
+            </motion.li>
+          ))}
+        </ul>
+
+        <button className={styles.burger} onClick={() => setOpen(!open)}>
+          <span className={open ? styles.open : ''} />
+          <span className={open ? styles.open : ''} />
+          <span className={open ? styles.open : ''} />
+        </button>
+      </motion.div>
 
       <AnimatePresence>
         {open && (
           <motion.div className={styles.mobile}
-            initial={{ opacity:0, y:-20 }}
-            animate={{ opacity:1, y:0 }}
-            exit={{    opacity:0, y:-20 }}
-            transition={{ duration:0.3 }}
+            initial={{ opacity:0, scale:0.95, y:-10 }}
+            animate={{ opacity:1, scale:1,    y:0 }}
+            exit={{    opacity:0, scale:0.95, y:-10 }}
+            transition={{ duration:0.25, ease:[0.16,1,0.3,1] }}
           >
             {LINKS.map(l => (
               <button

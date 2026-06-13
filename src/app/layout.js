@@ -1,6 +1,7 @@
-import '../styles/globals.scss'
+﻿import '../styles/globals.scss'
 import Navbar from './components/Navbar/Navbar'
 import Cursor from './components/Cursor/Cursor'
+import MeshBackground from './components/MeshBackground/MeshBackground'
 
 export const metadata = {
   title: 'Khush Sharma - Digital Identity',
@@ -9,8 +10,9 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang='en'>
+    <html lang="en">
       <body>
+        <MeshBackground />
         <Cursor />
         <Navbar />
         {children}

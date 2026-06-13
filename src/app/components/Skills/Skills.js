@@ -1,99 +1,161 @@
 ﻿'use client'
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import styles from './Skills.module.scss'
 
-const SKILLS = [
+const LEVELS = { 1: ['Beginner', 30], 2: ['Intermediate', 55], 3: ['Advanced', 78], 4: ['Expert', 95] }
+
+const CATEGORIES = [
   {
-    category: 'Languages',
-    color: '#38bdf8',
-    icon: '</>',
-    items: ['Python', 'R', 'C++', 'C#'],
+    id: 'languages', label: 'Languages', color: '#4f8ef7',
+    skills: [
+      { name: 'Python', lvl: 4, icon: 'python' },
+      { name: 'Java', lvl: 3, icon: 'openjdk' },
+      { name: 'SQL', lvl: 2, icon: 'mysql' },
+      { name: 'JavaScript', lvl: 2, icon: 'javascript' },
+      { name: 'R', lvl: 2, icon: 'r' },
+    ],
   },
   {
-    category: 'AI & ML',
-    color: '#c084fc',
-    icon: '⬡',
-    items: ['LLMs', 'RAG', 'LangChain', 'PyTorch', 'TensorFlow', 'Scikit-learn', 'BERT', 'NLP', 'CNN', 'OpenCV', 'Supervised Learning', 'Neural Networks'],
+    id: 'ai-ml', label: 'AI / ML & Data', color: '#a855f7',
+    skills: [
+      { name: 'Deep Learning', lvl: 4, icon: 'pytorch' },
+      { name: 'NLP', lvl: 4, icon: 'huggingface' },
+      { name: 'Image Processing', lvl: 4, icon: 'opencv' },
+      { name: 'Computer Vision', lvl: 3, icon: 'tensorflow' },
+      { name: 'EDA', lvl: 3, icon: 'pandas' },
+      { name: 'Data Analysis', lvl: 3, icon: 'plotly' },
+    ],
   },
   {
-    category: 'Automation',
-    color: '#4ade80',
-    icon: '⟳',
-    items: ['Zapier', 'n8n', 'Webhooks', 'Google Sheets API', 'Google Drive API', 'Gmail API', 'OpenAI API', 'Flask'],
+    id: 'devtools', label: 'Dev Tools', color: '#34d399',
+    skills: [
+      { name: 'Claude Code', lvl: 3, icon: 'anthropic' },
+      { name: 'WordPress / Framer', lvl: 3, icons: ['wordpress', 'framer'] },
+      { name: 'Git / GitHub', lvl: 3, icons: ['git', 'github'] },
+      { name: 'Next.js', lvl: 2, icon: 'nextdotjs' },
+      { name: 'React.js', lvl: 2, icon: 'react' },
+      { name: 'Three.js', lvl: 2, icon: 'threedotjs' },
+    ],
   },
   {
-    category: 'Data & Analysis',
-    color: '#f59e0b',
-    icon: '▦',
-    items: ['Pandas', 'EDA', 'Tableau', 'RStudio', 'Image Processing', 'Model Evaluation', 'Jira API'],
-  },
-  {
-    category: 'Web & Backend',
-    color: '#818cf8',
-    icon: '◈',
-    items: ['Streamlit', 'FastAPI', 'Next.js', 'React', 'WordPress', 'Framer'],
-  },
-  {
-    category: 'Infrastructure',
-    color: '#fb7185',
-    icon: '⬙',
-    items: ['Docker', 'AWS', 'PostgreSQL', 'Redis', 'Git', 'IoT Systems'],
+    id: 'automation', label: 'Automation', color: '#fbbf24',
+    skills: [
+      { name: 'Zapier', lvl: 3, icon: 'zapier' },
+      { name: 'n8n', lvl: 3, icon: 'n8n' },
+      { name: 'Google API', lvl: 3, icon: 'google' },
+      { name: 'API Integration', lvl: 3, icon: 'postman' },
+      { name: 'Webhooks', lvl: 2, icon: 'webhooks' },
+    ],
   },
 ]
 
+const ICON_BASE = 'https://cdn.jsdelivr.net/npm/simple-icons@v11/icons'
+
+function LeafIcons({ skill }) {
+  const list = skill.icons || [skill.icon]
+  return (
+    <span className={styles.leafIcons}>
+      {list.map((slug) => (
+        <span className={styles.iconSlot} key={slug}>
+          <img
+            src={`${ICON_BASE}/${slug}.svg`}
+            alt=""
+            className={styles.leafIcon}
+            loading="lazy"
+            onError={(e) => e.currentTarget.parentElement.classList.add(styles.broken)}
+          />
+          <span className={styles.fallback}>{skill.name[0]}</span>
+        </span>
+      ))}
+    </span>
+  )
+}
+
 export default function Skills() {
   const ref = useRef()
-  const inView = useInView(ref, { once: true, margin: '-80px' })
+  const inView = useInView(ref, { once: true, margin: '-100px' })
+  const [active, setActive] = useState(null)
+  const [breathe, setBreathe] = useState(false)
+  const breatheRef = useRef(null)
+  const triggerBreathe = () => {
+    setBreathe(true)
+    clearTimeout(breatheRef.current)
+    breatheRef.current = setTimeout(() => setBreathe(false), 4000)
+  }
 
   return (
-    <section id='skills' className={styles.skills} ref={ref}>
+    <section id="skills" className={styles.skills} ref={ref}>
       <div className={styles.inner}>
-        <motion.span className={styles.label}
-          initial={{ opacity:0 }} animate={inView ? { opacity:1 } : {}} transition={{ duration:0.6 }}>
+        <motion.span
+          className={styles.label}
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}}
+          transition={{ duration: 0.6 }}
+        >
           Skills
         </motion.span>
 
-        <motion.h2 className={styles.h2}
-          initial={{ opacity:0, y:24 }}
-          animate={inView ? { opacity:1, y:0 } : {}}
-          transition={{ duration:0.8, delay:0.1, ease:[0.16,1,0.3,1] }}>
-          The stack I think in.
+        <motion.h2
+          initial={{ opacity: 0, y: 24 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.8, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+        >
+          A toolkit,<br />
+          <span className={styles.accent}>branch by branch.</span>
         </motion.h2>
 
-        <div className={styles.grid}>
-          {SKILLS.map((group, gi) => (
-            <motion.div key={group.category} className={styles.card}
-              initial={{ opacity:0, y:40 }}
-              animate={inView ? { opacity:1, y:0 } : {}}
-              transition={{ duration:0.6, delay: 0.15 + gi * 0.08, ease:[0.16,1,0.3,1] }}
-              style={{ '--accent-color': group.color }}
-              whileHover={{ y:-6, transition: { duration: 0.2 } }}>
+        <div
+          className={[styles.tree, inView ? styles.drawn : '', breathe ? styles.breathing : ''].filter(Boolean).join(' ')}
+          onMouseLeave={() => setActive(null)}
+        >
+          <div className={styles.root} onMouseEnter={triggerBreathe}>
+            <span className={styles.rootDot} />
+            <span className={styles.rootLabel}>Skills</span>
+          </div>
 
-              <div className={styles.cardHeader}>
-                <span className={styles.icon} style={{ color: group.color }}>{group.icon}</span>
-                <span className={styles.category}>{group.category}</span>
-                <span className={styles.count}>{group.items.length}</span>
-              </div>
+          <div className={styles.trunk} />
 
-              <div className={styles.divider} style={{ background: group.color }} />
+          <div className={styles.branches}>
+            {CATEGORIES.map((cat) => {
+              const dim = active && active !== cat.id
+              return (
+                <div
+                  key={cat.id}
+                  className={`${styles.row} ${active === cat.id ? styles.activeRow : ''} ${dim ? styles.dim : ''}`}
+                  style={{ '--accent': cat.color }}
+                  onMouseEnter={() => setActive(cat.id)}
+                >
+                  <div className={styles.catNode}>
+                    <span className={styles.catDot} />
+                    <span className={styles.catLabel}>{cat.label}</span>
+                  </div>
 
-              <div className={styles.pills}>
-                {group.items.map((item, ii) => (
-                  <motion.span key={item} className={styles.pill}
-                    style={{ '--c': group.color }}
-                    initial={{ opacity:0, scale:0.75, y:10 }}
-                    animate={inView ? { opacity:1, scale:1, y:0 } : {}}
-                    transition={{ delay: 0.2 + gi * 0.08 + ii * 0.035, ease:[0.16,1,0.3,1] }}
-                    whileHover={{ scale:1.08, transition:{ duration:0.15 } }}>
-                    {item}
-                  </motion.span>
-                ))}
-              </div>
-            </motion.div>
-          ))}
+                  <span className={styles.branch} />
+
+                  <div className={styles.leaves}>
+                    {cat.skills.map((skill) => {
+                      const [levelText, pct] = LEVELS[skill.lvl]
+                      return (
+                        <div className={styles.leaf} key={skill.name} title={levelText}>
+                          <LeafIcons skill={skill} />
+                          <div className={styles.leafText}>
+                            <span className={styles.leafName}>{skill.name}</span>
+                            <span className={styles.levelBar}>
+                              <span className={styles.levelFill} style={{ width: `${pct}%` }} />
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       </div>
     </section>
   )
 }
+
