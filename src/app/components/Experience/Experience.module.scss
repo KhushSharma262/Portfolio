@@ -191,3 +191,50 @@
   color: color-mix(in srgb, var(--text) 70%, transparent);
 }
 
+
+/* ---------- Mobile: vertical timeline ---------- */
+@media (max-width: 860px) {
+  .track { min-height: 0; }
+  .line { display: none; }
+
+  .steps {
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+    padding-left: 28px;
+  }
+
+  .steps::before {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 6px;
+    bottom: 6px;
+    width: 2px;
+    background: linear-gradient(180deg, rgba(168,85,247,0.6) 0%, rgba(79,142,247,0.6) 100%);
+    border-radius: 2px;
+  }
+
+  .step {
+    flex: none;
+    width: 100%;
+    padding: 0 0 2rem 0;
+    position: relative;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .step:last-child { padding-bottom: 0; }
+
+  .node { position: absolute; left: -28px; top: 4px; }
+
+  .nodeDot {
+    width: 14px; height: 14px;
+    background: var(--tint, #4f8ef7);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--tint, #4f8ef7) 20%, transparent), 0 0 16px var(--tint, #4f8ef7);
+  }
+
+  .head { padding-right: 0; margin-bottom: 0.3rem; }
+
+  .details { margin-top: 0.9rem; max-width: 100%; }
+}

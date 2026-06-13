@@ -1,5 +1,5 @@
 ﻿'use client'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, AnimatePresence, useInView } from 'framer-motion'
 import styles from './Experience.module.scss'
 
@@ -62,7 +62,7 @@ const TIMELINE = [
   },
 ]
 
-function Step({ item, active, onActivate }) {
+function Step({ item, active, onActivate, isMobile }) {
   const isOpen = active === item.id
   return (
     <div
@@ -118,6 +118,14 @@ function Step({ item, active, onActivate }) {
 export default function Experience() {
   const ref = useRef()
   const inView = useInView(ref, { once: true, margin: '-100px' })
+  const [isMobile, setIsMobile] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 860px)')
+    const update = () => setIsMobile(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
   const [active, setActive] = useState('latenthq')
 
   return (
@@ -145,7 +153,7 @@ export default function Experience() {
           <div className={styles.line} />
           <div className={styles.steps}>
             {TIMELINE.map((item) => (
-              <Step key={item.id} item={item} active={active} onActivate={setActive} />
+              <Step key={item.id} item={item} active={active} onActivate={setActive} isMobile={isMobile} />
             ))}
           </div>
         </div>
@@ -153,3 +161,6 @@ export default function Experience() {
     </section>
   )
 }
+
+
+

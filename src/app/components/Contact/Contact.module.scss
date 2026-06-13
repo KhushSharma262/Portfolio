@@ -182,3 +182,39 @@
 
 
 
+
+/* ---------- Mobile: globe behind connect panel ---------- */
+@media (max-width: 860px) {
+  .grid {
+    display: block;
+    position: relative;
+    min-height: 620px;
+  }
+
+  .globeWrap {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 115%;
+    max-width: none;
+    opacity: 0.55;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .connect {
+    position: relative;
+    z-index: 2;
+    transform: none;
+    margin: 0 auto;
+    max-width: 460px;
+    background: rgba(14, 18, 34, 0.55);
+    backdrop-filter: blur(28px) saturate(170%);
+    -webkit-backdrop-filter: blur(28px) saturate(170%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,0.05) inset,
+      0 20px 60px rgba(0,0,0,0.5);
+  }
+}
